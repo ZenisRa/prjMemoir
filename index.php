@@ -15,6 +15,28 @@ $username = $_SESSION['username'] ?? 'Utente';
     <title>Promemoria</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* Dissolvenza fade-in per index.php quando si arriva da login */
+        body.fade-in {
+            animation: fadeInPage 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+        
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Nascondi il body inizialmente se c'è il flag di login */
+        body.hide-on-load {
+            opacity: 0;
+        }
+    </style>
+    <style>
         /* Piccoli aggiustamenti inline per icone e colori */
         .sort-select { cursor: pointer; border: 1px solid transparent; }
         .sort-select:hover { border-color: #ddd; }
@@ -37,8 +59,11 @@ $username = $_SESSION['username'] ?? 'Utente';
 
     <!-- SIDEBAR SINISTRA -->
     <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Logo">
+        </div>
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="🔍 Cerca ovunque...">
+            <input type="text" id="searchInput" placeholder="Cerca ovunque...">
         </div>
 
         <div class="lists-group">
@@ -67,14 +92,38 @@ $username = $_SESSION['username'] ?? 'Utente';
         </div>
 
         <div class="sidebar-footer">
-            <button class="btn-text" onclick="addNewList()">+ Lista</button>
+            <button class="glass-btn btn-add-list" onclick="addNewList()" title="Aggiungi Lista">
+                <span>+</span>
+                <span>Lista</span>
+            </button>
             <button class="glass-btn btn-theme-glass" onclick="toggleTheme()" id="themeBtn" title="Cambia tema">🌙</button>
-            <button class="btn-text" onclick="logout()" style="color: #ff3b30;">Esci</button>
+        </div>
+        
+        <!-- Footer Credits -->
+        <div class="sidebar-credits">
+            <div class="credits-content">
+                <span>Alessio Bonn, Ali Frihat, Denis Ravanelli</span>
+                <span class="credits-school">ITT BUONARROTI</span>
+            </div>
         </div>
     </aside>
 
     <!-- LISTA CENTRALE -->
     <main class="main-list">
+        <!-- Riquadro Logout con stile Liquid Glass -->
+        <div class="logout-panel">
+            <div class="logout-content">
+                <div class="logout-user">
+                    <span class="logout-icon">👤</span>
+                    <span class="logout-username"><?php echo htmlspecialchars($username); ?></span>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Esci">
+                    <span>Esci</span>
+                    <span class="logout-arrow">→</span>
+                </button>
+            </div>
+        </div>
+        
         <header class="list-header">
             <h1 id="currentListTitle">Oggi</h1>
             <div class="header-actions" style="flex:1; display:flex; justify-content:flex-end; align-items:center;">
@@ -138,5 +187,21 @@ $username = $_SESSION['username'] ?? 'Utente';
 </div>
 
 <script src="js/script.js"></script>
+<script>
+    // Dissolvenza fade-in quando si arriva da login
+    <?php if(isset($_SESSION['just_logged_in']) && $_SESSION['just_logged_in']): ?>
+        // Rimuovi il flag per non rifare l'animazione al refresh
+        <?php unset($_SESSION['just_logged_in']); ?>
+        
+        // Aggiungi classe per nascondere inizialmente
+        document.body.classList.add('hide-on-load');
+        
+        // Dopo un breve delay, aggiungi la classe fade-in
+        setTimeout(() => {
+            document.body.classList.remove('hide-on-load');
+            document.body.classList.add('fade-in');
+        }, 50);
+    <?php endif; ?>
+</script>
 </body>
 </html>

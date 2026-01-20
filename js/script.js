@@ -199,6 +199,9 @@ function creaHtmlTask(task, container) {
                 ${task.date ? ' - ' + formattaData(task.date) : ''}
             </span>
         </div>
+        <button class="task-delete-btn glass-delete-btn" onclick="event.stopPropagation(); deleteTaskFromList(${task.id})" title="Elimina">
+            🗑️
+        </button>
     `;
     container.appendChild(riga);
 }
@@ -432,7 +435,7 @@ function saveTask() {
         });
     }
 }
-// Elimina un task dal database e dall'app
+// Elimina un task dal database e dall'app (dal pannello dettagli)
 function deleteTask() {
     if (confirm("Eliminare definitivamente?")) {
         const taskId = idPromemoriaCorrente;
@@ -458,6 +461,37 @@ function deleteTask() {
         
         aggiornaInterfaccia();
         closeDetails();
+    }
+}
+
+// Elimina un task direttamente dalla lista
+function deleteTaskFromList(taskId) {
+    if (confirm("Eliminare definitivamente?")) {
+        // Rimuovi dall'array locale
+        elencoPromemoria = elencoPromemoria.filter(t => t.id !== taskId);
+        
+        // Se il task eliminato era quello aperto nei dettagli, chiudi il pannello
+        if (idPromemoriaCorrente == taskId) {
+            closeDetails();
+        }
+        
+        // Elimina dal database
+        fetch('api/delete_task.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: taskId })
+        })
+        .then(res => res.json())
+        .then(dati => {
+            if (dati.success) {
+                console.log("Task eliminato dal database");
+            } else {
+                console.error("Errore eliminazione:", dati.message);
+            }
+        })
+        .catch(err => console.error("Errore fetch:", err));
+        
+        aggiornaInterfaccia();
     }
 }
 
