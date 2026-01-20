@@ -1,0 +1,184 @@
+/*css/style.css */
+
+/* --- VARIABILI COLORI --- */
+:root {
+    --bg-body: #ffffff;
+    --bg-sidebar: #f2f2f7;
+    --bg-content: #ffffff;
+    --bg-panel: #f9f9f9; 
+    --bg-input: #e3e3e8;
+    --bg-hover: #e4e4e9;
+    --text-main: #1c1c1e;
+    --text-secondary: #8e8e93;
+    --border-color: #d1d1d6;
+    --accent-color: #007aff;
+}
+
+[data-theme="dark"] {
+    --bg-body: #000000;
+    --bg-sidebar: #1c1c1e;
+    --bg-content: #000000;
+    --bg-panel: #1c1c1e;
+    --bg-input: #2c2c2e;
+    --bg-hover: #3a3a3c;
+    --text-main: #ffffff;
+    --text-secondary: #98989d;
+    --border-color: #38383a;
+    --accent-color: #0a84ff;
+}
+
+/* --- RESET --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { height: 100vh; overflow: hidden; background-color: var(--bg-body); color: var(--text-main); }
+
+/* --- LAYOUT GENERALE (3 COLONNE) --- */
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* COLONNA 1: SIDEBAR */
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex; flex-direction: column; padding: 15px; flex-shrink: 0;
+}
+
+/* COLONNA 2: LISTA CENTRALE */
+.main-list {
+    flex: 1;
+    display: flex; flex-direction: column;
+    background-color: var(--bg-content);
+    min-width: 300px;
+}
+
+/* COLONNA 3: DETTAGLI */
+.details-panel {
+    width: 350px;
+    background-color: var(--bg-panel);
+    border-left: 1px solid var(--border-color);
+    padding: 20px;
+    display: none; /* Nascosto di default */
+    overflow-y: auto; flex-shrink: 0; height: 100vh;
+}
+.details-panel.open { display: block; }
+
+/* --- ELEMENTI INTERNI --- */
+
+/* Sidebar */
+.search-bar input {
+    width: 100%; padding: 8px; border-radius: 8px;
+    border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);
+}
+.lists-group { flex: 1; overflow-y: auto; margin-top: 20px; }
+.lists-group h4 { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin: 15px 0 5px 10px; }
+.list-item {
+    display: flex; align-items: center; padding: 8px 12px; margin-bottom: 2px;
+    border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 0.95rem;
+}
+.list-item:hover { background-color: var(--bg-hover); }
+.list-item.active { background-color: var(--bg-input); font-weight: 600; }
+
+.sidebar-footer {
+    padding-top: 15px; margin-top: auto; border-top: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.btn-text {
+    background: none; border: none; color: var(--text-secondary); cursor: pointer;
+    font-size: 0.9rem; padding: 5px; border-radius: 6px; display: flex; align-items: center;
+}
+.btn-text:hover { color: var(--accent-color); background-color: var(--bg-hover); }
+
+/* Main List */
+.list-header {
+    padding: 20px 30px; border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.list-header h1 { color: var(--accent-color); margin: 0; font-size: 1.8rem; }
+.sort-select {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color);
+    color: var(--accent-color); background: var(--bg-content); cursor: pointer;
+}
+.tasks-container { flex: 1; overflow-y: auto; padding: 0 30px; }
+.task-row {
+    display: flex; align-items: center; padding: 12px 0;
+    border-bottom: 1px solid var(--border-color); cursor: pointer;
+}
+.task-row:hover { background-color: var(--bg-hover); }
+.task-info { margin-left: 10px; }
+.task-title { font-size: 1rem; display: block; color: var(--text-main); }
+.task-meta { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; display: block; }
+
+/* Details Form */
+.details-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.details-header h3 { color: var(--text-main); }
+.detail-group { margin-bottom: 15px; }
+.detail-group label { display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; }
+.detail-group input, .detail-group textarea, .detail-group select {
+    width: 100%; padding: 8px; border: 1px solid var(--border-color);
+    border-radius: 6px; background: var(--bg-content); color: var(--text-main);
+}
+.btn-primary {
+    background-color: var(--accent-color); color: white; border: none;
+    padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: 600;
+}
+.btn-delete-list { margin-left: auto; border: none; background: none; color: #ff3b30; cursor: pointer; opacity: 0; }
+.list-item:hover .btn-delete-list { opacity: 1; }
+
+/* Indicatori Priorità */
+.priority-indicator { font-weight: 900; margin-right: 5px; }
+.prio-1 { color: var(--accent-color); }
+.prio-2 { color: #ff9f0a; }
+.prio-3 { color: #ff3b30; }
+
+
+/* --- LIQUID GLASS DESIGN (Bottoni Speciali) --- */
+
+.glass-btn {
+    position: relative; display: flex; justify-content: center; align-items: center;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    color: var(--accent-color);
+    border-radius: 16px; cursor: pointer; transition: all 0.3s ease; overflow: hidden;
+}
+
+.glass-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 40px 0 rgba(31, 38, 135, 0.25);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+}
+
+[data-theme="dark"] .glass-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+/* Dimensioni specifiche */
+.btn-add-main {
+    width: 50px; height: 50px; font-size: 2rem; font-weight: 300; margin-right: 15px; border-radius: 14px;
+}
+.btn-theme-glass {
+    width: 42px; height: 42px; font-size: 1.3rem; border-radius: 50%;
+}
+
+
+
+/* Forza lo sfondo scuro (ma non nero totale) e il testo BIANCO */
+[data-theme="dark"] select,
+[data-theme="dark"] select option {
+    background-color: #2c2c2e !important; /* Grigio scuro per contrasto */
+    color: #ffffff !important;            /* Bianco puro per leggibilità */
+}
+
+/* Rimuove eventuali ombreggiature strane del browser */
+[data-theme="dark"] select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.3);
+}
