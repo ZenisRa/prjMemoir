@@ -39,10 +39,12 @@ function caricaDatiDalServer() {
                 elencoListe = dati.liste || ["Generale"];
                 aggiornaInterfaccia();
                 console.log("Dati caricati con successo:", dati);
+                console.log("Liste disponibili:", elencoListe);
             } else {
                 console.error("Errore caricamento dati:", dati.message);
                 elencoPromemoria = [];
                 elencoListe = ["Generale"];
+                aggiornaInterfaccia();
             }
         })
         .catch(err => {
@@ -50,10 +52,7 @@ function caricaDatiDalServer() {
             elencoPromemoria = [];
             elencoListe = ["Generale"];
             aggiornaInterfaccia();
-        })
-
-    // Disegniamo la pagina vuota
-    aggiornaInterfaccia();
+        });
 }
 
 /**
@@ -148,14 +147,45 @@ function renderAllTasks() {
 
     // --- C. ORDINAMENTO ---
     if (modoOrdinamento === 'priority') {
-        // Ordina per priorità decrescente (3 -> 0)
-        compitiDaMostrare.sort((a, b) => b.priority - a.priority);
-    } else if (modoOrdinamento === 'date') {
-        // Ordina per data crescente
+        // Ordina per priorità decrescente (3 -> 0), poi per data
         compitiDaMostrare.sort((a, b) => {
-            if(!a.date) return 1; 
-            if(!b.date) return -1;
+            const prioA = parseInt(a.priority) || 0;
+            const prioB = parseInt(b.priority) || 0;
+            if (prioB !== prioA) {
+                return prioB - prioA; // Priorità decrescente
+            }
+            // Se stessa priorità, ordina per data
+            if (!a.date) return 1;
+            if (!b.date) return -1;
             return new Date(a.date) - new Date(b.date);
+        });
+    } else if (modoOrdinamento === 'date') {
+        // Ordina per data crescente (più vicini prima), poi per priorità
+        compitiDaMostrare.sort((a, b) => {
+            if (!a.date && !b.date) {
+                // Entrambi senza data: ordina per priorità
+                return (parseInt(b.priority) || 0) - (parseInt(a.priority) || 0);
+            }
+            if (!a.date) return 1; // Senza data vanno dopo
+            if (!b.date) return -1;
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            if (dateA.getTime() !== dateB.getTime()) {
+                return dateA - dateB; // Data crescente
+            }
+            // Stessa data: ordina per priorità
+            return (parseInt(b.priority) || 0) - (parseInt(a.priority) || 0);
+        });
+    } else if (modoOrdinamento === 'name') {
+        // Ordina per nome A-Z, poi per priorità
+        compitiDaMostrare.sort((a, b) => {
+            const nomeA = (a.title || '').toLowerCase();
+            const nomeB = (b.title || '').toLowerCase();
+            if (nomeA !== nomeB) {
+                return nomeA.localeCompare(nomeB, 'it'); // Ordine alfabetico italiano
+            }
+            // Stesso nome: ordina per priorità
+            return (parseInt(b.priority) || 0) - (parseInt(a.priority) || 0);
         });
     }
 
@@ -233,18 +263,57 @@ function renderSidebarLists() {
 function addNewList() {
     const nome = prompt("Nome della nuova lista:");
     if (nome && nome.trim() !== "") {
-        elencoListe.push(nome);
-        // FUTURO: Salva su DB
-        aggiornaInterfaccia();
+        // Salva la lista nel database
+        fetch('api/save_list.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nome.trim() })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                // Ricarica i dati dal server per ottenere le liste aggiornate
+                caricaDatiDalServer();
+                console.log("Lista salvata:", result);
+            } else {
+                alert("Errore: " + (result.message || "Impossibile salvare la lista"));
+                console.error("Errore salvataggio lista:", result);
+            }
+        })
+        .catch(err => {
+            console.error("Errore fetch:", err);
+            alert("Errore di connessione al server.");
+        });
     }
 }
 
 function deleteList(nomeLista) {
     if (confirm(`Eliminare la lista "${nomeLista}"?`)) {
-        elencoListe = elencoListe.filter(l => l !== nomeLista);
-        // Se stavi guardando quella lista, torna a Oggi
-        if (filtroCorrente === nomeLista) switchFilter('today');
-        aggiornaInterfaccia();
+        // Elimina la lista dal database
+        fetch('api/delete_list.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nomeLista })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                // Se stavi guardando quella lista, torna a Oggi
+                if (filtroCorrente === nomeLista) {
+                    switchFilter('today', document.getElementById('filter-today'));
+                }
+                // Ricarica i dati dal server per ottenere le liste aggiornate
+                caricaDatiDalServer();
+                console.log("Lista eliminata:", result);
+            } else {
+                alert("Errore: " + (result.message || "Impossibile eliminare la lista"));
+                console.error("Errore eliminazione lista:", result);
+            }
+        })
+        .catch(err => {
+            console.error("Errore fetch:", err);
+            alert("Errore di connessione al server.");
+        });
     }
 }
 
