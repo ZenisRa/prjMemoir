@@ -12,7 +12,7 @@ $username = $_SESSION['username'] ?? 'Utente';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promemoria</title>
+    <title>Memoir - Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Dissolvenza fade-in per index.php quando si arriva da login */
@@ -126,16 +126,17 @@ $username = $_SESSION['username'] ?? 'Utente';
         
         <header class="list-header">
             <h1 id="currentListTitle">Oggi</h1>
-            <div class="header-actions" style="flex:1; display:flex; justify-content:flex-end; align-items:center;">
+            <div class="header-actions" style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap: 10px; flex-wrap: nowrap;">
                 <!-- Bottone "+" in stile Liquid Glass -->
                 <button title="Nuovo Promemoria" onclick="createNewTask()" class="glass-btn btn-add-main">
                     +
                 </button>
                 
-                <select id="sortOrder" class="sort-select glass-select" onchange="renderAllTasks()">
+                <select id="sortOrder" class="sort-select" onchange="renderAllTasks()" style="display: block !important; visibility: visible !important; opacity: 1 !important; flex-shrink: 0; margin-right: 170px;">
                     <option value="manual">Ordina per...</option>
-                    <option value="date">📅 Data Scadenza</option>
-                    <option value="priority">❗ Urgenza</option>
+                    <option value="priority">❗ Priorità</option>
+                    <option value="date">⏰ Tempo</option>
+                    <option value="name">🔤 Nome A-Z</option>
                 </select>
             </div>
         </header>
